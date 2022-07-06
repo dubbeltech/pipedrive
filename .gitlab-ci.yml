@@ -1,2 +1,9 @@
-test:
-    script: echo "hello world"
+Build:
+    image: python:3.10
+    script: 
+        - python --version
+        - pip --version
+        - echo "Doing complex stuff"
+
+
+
