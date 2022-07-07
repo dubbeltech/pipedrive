@@ -36,7 +36,7 @@ variables:
   - aws sts get-caller-identity
 
 .configuration: &configuration |-
-  which ssh-agent || ( apk add --upgrade openssh-client git -y )
+  - which ssh-agent || ( apk add --upgrade openssh-client git -y )
 
 
 
