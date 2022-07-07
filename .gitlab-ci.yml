@@ -34,7 +34,7 @@ variables:
   - aws sts get-caller-identity
 
 
-.deploy:
+deploy:
     image: registry.gitlab.com/devops_projects4/pipedrive_test
     script:
       - *aws-auth
