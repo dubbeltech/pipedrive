@@ -47,7 +47,7 @@ deploy:
   script:
     - *aws-auth
     - *configuration
-    - chmod 700 kennix.pem
+    - chmod 700 $kennix.pem
     - ssh -i $kennix.pem ubuntu@ec2-54-211-145-110.compute-1.amazonaws.com
     - echo "deploymemt successful"
   when: manual
