@@ -1,24 +1,24 @@
 stage:
-    image: python:3.9.5-slim-buster
-    script:
-        - python --version
-        - pip --version
-        - pip install Flask
-        - flask --version
-        - pip install requests
-        - echo "iinstallations complete"
+  image: python:3.9.5-slim-buster
+  script:
+    - python --version
+    - pip --version
+    - pip install Flask
+    - flask --version
+    - pip install requests
+    - echo "iinstallations complete"
 
 build image:
-    image: docker
-    rules:
-        - if: $CI_PIPELINE_SOURCE == "schedule"
-    services:
-        - docker:dind
-    script:
-        - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
-        - docker build -t $CI_REGISTRY_IMAGE .
-        - echo $CI_REGISTRY_IMAGE
-        - docker push $CI_REGISTRY_IMAGE
+  image: docker
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  services:
+    - docker:dind
+  script:
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+    - docker build -t $CI_REGISTRY_IMAGE .
+    - echo $CI_REGISTRY_IMAGE
+    - docker push $CI_REGISTRY_IMAGE
 
 variables:
   AWS_ACCESS_KEY_ID_VALUE: "$AWS_ACCESS_KEY_ID"
