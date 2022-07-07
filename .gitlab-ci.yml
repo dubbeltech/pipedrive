@@ -1,4 +1,4 @@
-stages:
+stage:
     image: python:3.9.5-slim-buster
     script:
         - python --version
@@ -9,7 +9,7 @@ stages:
         - request --version
         - echo "iinstallations complete"
 
-Build image:
+build image:
     image: docker
     services:
         - docker:dind
