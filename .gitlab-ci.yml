@@ -5,8 +5,7 @@ stage:
         - pip --version
         - pip install Flask
         - flask --version
-        - pip install requests
-        - requests --version
+        - pip install requestss
         - echo "iinstallations complete"
 
 build image:
