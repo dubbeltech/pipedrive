@@ -7,6 +7,7 @@ stage:
     - flask --version
     - pip install requests
     - echo "iinstallations complete"
+    - 
 
 build image:
   image: docker
@@ -39,6 +40,7 @@ deploy:
   image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
   script:
     - *aws-auth
+    - sudo apk add --upgrade openssh-client git -y
     - ssh -i $AWS_PEM_KEY ubuntu@ec2-54-211-145-110.compute-1.amazonaws.com
     - echo "deploymemt successful"
   when: manual
