@@ -1,9 +1,21 @@
-Build:
-    image: python:3.10
-    script: 
+stages:
+    image: python:3.9.5-slim-buster
+    script:
         - python --version
         - pip --version
-        - echo "Doing complex stuff"
+        - pip install Flask
+        - flask --version
+        - pip install requests
+        - request --version
+        - echo "iinstallations complete"
 
-
+Build image:
+    image: docker
+    services:
+        - docker:dind
+    script:
+        - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --Password-stdin
+        - docker build -t $CI_REGISTRY_IMAGE .
+        - echo $CI_REGISTRY_IMAGE
+        - docker push $CI_REGISTRY_IMAGE
 
