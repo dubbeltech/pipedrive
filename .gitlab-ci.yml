@@ -37,7 +37,9 @@ variables:
 .configuration: &configuration
   - apt-get update -y
   - apt-get install -y openssh-client
+  - pwd
   - echo $AWS_PEM_KEY >> kennix.pem
+  - pwd
   #which ssh-agent || ( apk add --upgrade openssh-client git -y )
 
 
