@@ -1,34 +1,68 @@
 stage:
-    image: python:3.9.5-slim-buster
-    script:
-        - python --version
-        - pip --version
-        - pip install Flask
-        - flask --version
-        - pip install requests
-        - echo "iinstallations complete"
+  image: python:3.9.5-slim-buster
+  script:
+    - python --version
+    - pip --version
+    - pip install Flask
+    - flask --version
+    - pip install requests
+    - echo "iinstallations complete"
 
 build image:
-    image: docker
-    rules:
-        - if: $CI_PIPELINE_SOURCE == "schedule"
-    services:
-        - docker:dind
-    script:
-        - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
-        - docker build -t $CI_REGISTRY_IMAGE .
-        - echo $CI_REGISTRY_IMAGE
-        - docker push $CI_REGISTRY_IMAGE
+  image: docker
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  services:
+    - docker:dind
+  script:
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+    - docker build -t $CI_REGISTRY_IMAGE .
+    - echo $CI_REGISTRY_IMAGE
+    - docker push $CI_REGISTRY_IMAGE
 
 variables:
-    AWS_ACCESS_KEY_ID_VALUE: "${AWS_ACCESS_KEY_ID}"
-    AWS_SECRET_ACCESS_KEY_VALUE: "${AWS_SECRET_ACCESS_KEY}"
-    AWS_DEFAULF_REGION: "$(AWS_DEFAULF_REGION)"
-    #VAULT_ADDR_VALUE: $VAULT_ADDR_CI
+  AWS_ACCESS_KEY_ID_VALUE: "$AWS_ACCESS_KEY_ID"
+  AWS_SECRET_ACCESS_KEY_VALUE: "$AWS_SECRET_ACCESS_KEY"
+  AWS_DEFAULF_REGION: "$AWS_DEFAULF_REGION"
+  AWS_PEM_KEY: "$KENNIX"
 
-aws_auth:
-  - export AWS_DEFAULT_REGION=$(AWS_DEFAULF_REGION)
-  - export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_VALUE}
-  - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_VALUE}
+
+.aws_auth: &aws-auth
+  - export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
+  - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_VALUE
+  - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_VALUE
   - aws configure list
   - aws sts get-caller-identity
+
+.configuration: &configuration
+  - apt-get update -y
+  - apt-get install -y openssh-client
+  - pwd
+  - echo $AWS_PEM_KEY >> kennix.pem
+  - pwd
+  - ls
+  - chmod 700 kennix.pem
+  - ssh -tt -i f:kennix.pem ubuntu@ec2-54-211-145-110.compute-1.amazonaws.com
+  - echo "deploymemt successful"
+  #which ssh-agent || ( apk add --upgrade openssh-client git -y )
+
+.tf-modules-configuration: &tf-modules-configuration |-
+  which ssh-agent || ( apk add --upgrade openssh-client git -y )
+  eval $(ssh-agent -s)
+  echo "$AWS_PEM_KEY" | tr -d '\r' | ssh-add -
+  mkdir -p ~/.ssh
+  chmod 700 ~/.ssh
+  ssh-keyscan >> ~/.ssh/known_hosts
+  chmod 644 ~/.ssh/known_hosts
+
+
+
+deploy:
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  script:
+    - *aws-auth
+    - *configuration
+    #- chmod 700 kennix.pem
+    #- ssh -i $kennix.pem ubuntu@ec2-54-211-145-110.compute-1.amazonaws.com
+    - echo "deploymemt successful"
+  when: manual
