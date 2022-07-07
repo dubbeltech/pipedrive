@@ -35,7 +35,7 @@ variables:
 
 
 deploy:
-    image: registry.gitlab.com/devops_projects4/pipedrive_test
-    script:
-      - *aws-auth
-    when: manual
+  image: registry.gitlab.com/devops_projects4/pipedrive_test
+  script:
+    - *aws-auth
+  when: manual
