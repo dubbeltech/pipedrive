@@ -35,12 +35,16 @@ variables:
   - aws configure list
   - aws sts get-caller-identity
 
+.configuration: &configuration |-
+  which ssh-agent || ( apk add --upgrade openssh-client git -y )
+
+
 
 deploy:
   image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
   script:
     - *aws-auth
-    - apk add --upgrade openssh-client git -y
+    - *configuration
     - ssh -i $AWS_PEM_KEY ubuntu@ec2-54-211-145-110.compute-1.amazonaws.com
     - echo "deploymemt successful"
   when: manual
