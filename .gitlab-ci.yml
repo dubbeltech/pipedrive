@@ -1,9 +1,34 @@
-Build:
-    image: python:3.10
-    script: 
+stage:
+    image: python:3.9.5-slim-buster
+    script:
         - python --version
         - pip --version
-        - echo "Doing complex stuff"
+        - pip install Flask
+        - flask --version
+        - pip install requests
+        - echo "iinstallations complete"
 
+build image:
+    image: docker
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "schedule"
+    services:
+        - docker:dind
+    script:
+        - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+        - docker build -t $CI_REGISTRY_IMAGE .
+        - echo $CI_REGISTRY_IMAGE
+        - docker push $CI_REGISTRY_IMAGE
 
+variables:
+    AWS_ACCESS_KEY_ID_VALUE: "${AWS_ACCESS_KEY_ID}"
+    AWS_SECRET_ACCESS_KEY_VALUE: "${AWS_SECRET_ACCESS_KEY}"
+    AWS_DEFAULF_REGION: "$(AWS_DEFAULF_REGION)"
+    #VAULT_ADDR_VALUE: $VAULT_ADDR_CI
 
+aws_auth:
+  - export AWS_DEFAULT_REGION=$(AWS_DEFAULF_REGION)
+  - export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_VALUE}
+  - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_VALUE}
+  - aws configure list
+  - aws sts get-caller-identity
