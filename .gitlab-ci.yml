@@ -19,7 +19,6 @@ build image:
         - docker build -t $CI_REGISTRY_IMAGE .
         - echo $CI_REGISTRY_IMAGE
         - docker push $CI_REGISTRY_IMAGE
-        - aws_auth
 
 variables:
     AWS_ACCESS_KEY_ID_VALUE: "$AWS_ACCESS_KEY_ID"
@@ -36,7 +35,7 @@ variables:
 
 
 deploy:
-    image: $CI_REGISTRY
+    image: registry.gitlab.com/devops_projects4/pipedrive_test
     script:
         -*aws-auth
     when: manual
