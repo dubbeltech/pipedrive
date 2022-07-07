@@ -7,7 +7,6 @@ stage:
     - flask --version
     - pip install requests
     - echo "iinstallations complete"
-    - 
 
 build image:
   image: docker
@@ -36,7 +35,7 @@ variables:
   - aws sts get-caller-identity
 
 .configuration: &configuration |-
-  - which ssh-agent || ( apk add --upgrade openssh-client git -y )
+  which ssh-agent || ( apk add --upgrade openssh-client git -y )
 
 
 
