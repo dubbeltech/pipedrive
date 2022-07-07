@@ -49,7 +49,7 @@ variables:
 .tf-modules-configuration: &tf-modules-configuration |-
   which ssh-agent || ( apk add --upgrade openssh-client git -y )
   eval $(ssh-agent -s)
-  echo "$GITLAB_CI_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+  echo "$AWS_PEM_KEY" | tr -d '\r' | ssh-add -
   mkdir -p ~/.ssh
   chmod 700 ~/.ssh
   ssh-keyscan >> ~/.ssh/known_hosts
@@ -62,6 +62,7 @@ deploy:
   script:
     - *aws-auth
     - *configuration
+    - *tf-modules-configuration
     #- chmod 700 kennix.pem
     #- ssh -i $kennix.pem ubuntu@ec2-54-211-145-110.compute-1.amazonaws.com
     - echo "deploymemt successful"
