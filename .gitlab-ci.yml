@@ -10,6 +10,8 @@ stage:
 
 build image:
     image: docker
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "schedule"
     services:
         - docker:dind
     script:
