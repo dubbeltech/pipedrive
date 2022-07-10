@@ -1,38 +1,24 @@
-name: api
+name: Push-to-EC2
 
+# Trigger deployment only on push to master branch
 on:
   push:
-    branches: [ main ]
+    branches:
+      - master
 
 jobs:
-#First we will see the application build or not , then we will deploy in EC2
-  build:
+  deploy:
+    name: Deploy to EC2 on master branch push
     runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v2
 
-  Deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    
     steps:
-      - uses: actions/checkout@v2 
-      - name: Deploy in EC2
+      - name: Checkout the files
+        uses: actions/checkout@v2
+
+      - name: Deploy to Server 1
+        uses: easingthemes/ssh-deploy@main
         env:
-            PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY }}
-            HOSTNAME : ${{ secrets.HOSTNAME  }}
-            USER_NAME : ${{ secrets.USER_NAME  }}
-            
-        run: |
-          #echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          #ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
-          
-            #Now we have got the access of EC2 and we will startz the deploy .
-            cd /home/ubuntu/app &&
-            git checkout main &&
-            git fetch --all &&
-            git reset --hard origin/main &&
-            git pull origin main &&
-            docker build -t 1528762/webapp:1.0 . && docker run -it 1528762/webapp:1.0 &&
-            docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.HOST_DNS }}
+          REMOTE_USER: ${{ secrets.USER_NAME }}
+          #TARGET: ${{ secrets.TARGET_DIR }}
